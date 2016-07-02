@@ -17,15 +17,15 @@ attachfile = ""
 
 with ie.document 
 .write "<html><body bgcolor=#dddddd scroll=no>" 
-.write "<h2 align=center>密送群发邮件</h2><br>"
+.write "<h2 align=center>群发邮件</h2><br>"
 .write "<p>主题  ：<input id=theme type=text size=30 >" 
 .write "<p>正文  ：<input type=file name=fileField class=file id=text accept='.txt' >" 
 .write "<p>附件1 ：<input type=file name=fileField class=file id=attach1 >" 
 .write "<p>附件2 ：<input type=file name=fileField class=file id=attach2 >" 
 .write "<p>附件3 ：<input type=file name=fileField class=file id=attach3 >" 
-.write "<p>账号  ：<input id=user type=text size=15 value=liuyu > @mail.hust.edu.cn" 
-.write "<p>发件人：<input id=username type=text size=12 value=刘玉 >" 
-.write "<p>密码  ：<input id=password type=password size=30 >"
+.write "<p>账号  ：<input id=user type=text size=15 value=U201313778 > @mail.hust.edu.cn" 
+.write "<p>发件人：<input id=username type=text size=12 value=wjj >" 
+.write "<p>密码  ：<input id=password type=password size=30 value=dian201313778 >"
 .write "<br><br>" 
 .write "<input id=confirm type=button value=确定 >"
 .write "<input id=cancel type=button value=取消 >"
@@ -51,23 +51,42 @@ ie.quit '调用ie的quit方法，关闭IE窗口'
 end sub '随后会触发event_onquit，于是脚本也退出了'
 
 sub confirm '"确定"事件处理过程，这是关键'
+dim theme
+theme = ie.document.getElementById("theme").value
+if theme = "" then
+	MsgBox ("请输入主题！")
+else
+	WSH.Echo theme
+end if
+
 dim textname
 textfile = ie.document.getElementById("text").value
-fakepath = left(textfile,12)
-textname = replace(textfile,fakepath,"")
-WSH.Echo textname
+if textfile = "" then 
+	MsgBox ("请选择正文！")
+else
+	fakepath = left(textfile,12)
+	textname = replace(textfile,fakepath,"")
+	WSH.Echo textname
+end if 
 
 dim filename
 attach1file = ie.document.getElementById("attach1").value
-filename = replace(attach1file,fakepath,"")
-WSH.Echo filename
+if attach1file = "" then 
+else
+	filename = replace(attach1file,fakepath,"")
+	WSH.Echo filename
+end if	
 
 ''''''''''''''''''''''''''''''''''''''''''''' 
 WSH.Echo "发送部分"
-Set oExcel=CreateObject("excel.application")
-Set oWorkBook=oExcel.Workbooks.Open( "C:\Users\Wang Jiajing\Desktop\简报\简报邮箱\测试邮箱列表.xls" )
-SendEmailALL oWorkBook, textname,filename
-oExcel.Quit
+if textfile = "" Or theme = "" then 
+else
+	Set oExcel=CreateObject("excel.application")
+	Set oWorkBook=oExcel.Workbooks.Open( "C:\Users\Wang Jiajing\Desktop\简报\简报邮箱\测试邮箱列表.xls" )
+	SendEmailALL oWorkBook, textname,filename
+	oExcel.Quit
+end if
+
 ''''''''''''''''''''''''''''''''
 end sub
 
@@ -195,7 +214,7 @@ Function SendEmailToOneSheetAddr(Sheet, uiSheetCnt,textname,filename)
             SendOneEmail   strSendAddr, arrAccount(1), arrAccountName(1), arrPasswd(1),textname,filename'这里可更换账号发送,uiMyEmailCnt
             WSH.Echo "当前账户 :" & arrAccount(1)
             WSH.Echo "已发送至 :" & strSendAddr
-            wscript.sleep 2*60*1000  '单位ms 2分钟  
+            wscript.sleep 0.5*60*1000  '单位ms 0.5分钟  
             uiMyEmailCnt = uiMyEmailCnt + 1
             If uiMyEmailCnt = 2 Then '这个uiMyEmailCnt用来记录账号个数，也就是数组中元素个数
                 uiMyEmailCnt = 0
@@ -210,7 +229,7 @@ Function SendEmailToOneSheetAddr(Sheet, uiSheetCnt,textname,filename)
         SendOneEmail   strSendAddr, arrAccount(1), arrAccountName(1), arrPasswd(1),textname,filename'这里可更换账号发送,uiMyEmailCnt
         WSH.Echo "当前账户 :" & arrAccount(1)
         WSH.Echo "已发送至 :" & strSendAddr
-        wscript.sleep 2*60*1000  '单位ms 2分钟  
+        wscript.sleep 0.5*60*1000  '单位ms 0.5分钟  
         uiMyEmailCnt = uiMyEmailCnt + 1
         If uiMyEmailCnt = 2 Then '这个uiMyEmailCnt用来记录账号个数，也就是数组中元素个数
             uiMyEmailCnt = 0
@@ -221,7 +240,7 @@ Function SendEmailToOneSheetAddr(Sheet, uiSheetCnt,textname,filename)
 End Function
 
 Function SendEmailALL(Book,textname,filename)
-    For uiSheetCnt = 1 To 2 '注意修改这里的值，从第1张表到第22张表
+    For uiSheetCnt = 1 To 3 '注意修改这里的值，从第1张表到第22张表
         Set Sheet = Book.Sheets(uiSheetCnt)     
         SendEmailToOneSheetAddr Sheet,uiSheetCnt,textname,filename
     Next
