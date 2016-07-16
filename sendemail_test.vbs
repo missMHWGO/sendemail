@@ -18,14 +18,16 @@ attachfile = ""
 with ie.document 
 .write "<html><body bgcolor=#dddddd scroll=no>" 
 .write "<h2 align=center>群发邮件</h2><br>"
-.write "<p>主题  ：<input id=theme type=text size=30 >" 
-.write "<p>正文  ：<input type=file name=fileField class=file id=text accept='.txt' >" 
+.write "<p>*主题  ：<input id=theme type=text size=30 >" 
+.write "<p>*正文  ：<input type=file name=fileField class=file id=text accept='.txt' >" 
 .write "<p>附件1 ：<input type=file name=fileField class=file id=attach1 >" 
 .write "<p>附件2 ：<input type=file name=fileField class=file id=attach2 >" 
 .write "<p>附件3 ：<input type=file name=fileField class=file id=attach3 >" 
-.write "<p>账号  ：<input id=user type=text size=15 value=U201313778 > @mail.hust.edu.cn" 
-.write "<p>发件人：<input id=username type=text size=12 value=wjj >" 
-.write "<p>密码  ：<input id=password type=password size=30 value=dian201313778 >"
+.write "<p>*邮箱列表 ：<input type=file name=fileField class=file id=email_list >" 
+.write "<p>*从第<input type=text id=from value=1 >到第<input type=text id=to value=9 >张表"
+.write "<p>*账号  ：<input id=user type=text size=15 value= >@163.com" 
+.write "<p>发件人：<input id=username type=text size=12 value= >" 
+.write "<p>*密码  ：<input id=password type=password size=30 value= >"
 .write "<br><br>" 
 .write "<input id=confirm type=button value=确定 >"
 .write "<input id=cancel type=button value=取消 >"
@@ -70,19 +72,34 @@ else
 end if 
 
 dim filename
-attach1file = ie.document.getElementById("attach1").value
-if attach1file = "" then 
+for i = 1 to 3
+	attachfile = ie.document.getElementById("attach"&i).value
+	if attachfile = "" then 
+	else
+		filename_tmp = replace(attachfile,fakepath,"")
+		WSH.Echo filename_tmp
+		filename = filename &"|"&"C:\"&filename_tmp
+	end if	
+next
+strlen = Len(filename)
+filename = mid(filename,2,strlen) 
+WSH.Echo filename
+
+dim emailname
+emailfile = ie.document.getElementById("email_list").value
+if emailfile = "" then 
+	MsgBox ("请选择要发送的邮箱！")
 else
-	filename = replace(attach1file,fakepath,"")
-	WSH.Echo filename
-end if	
+	emailname = replace(emailfile,fakepath,"")
+	WSH.Echo emailname
+end if 
 
 ''''''''''''''''''''''''''''''''''''''''''''' 
 WSH.Echo "发送部分"
 if textfile = "" Or theme = "" then 
 else
 	Set oExcel=CreateObject("excel.application")
-	Set oWorkBook=oExcel.Workbooks.Open( "C:\Users\Wang Jiajing\Desktop\简报\简报邮箱\测试邮箱列表.xls" )
+	Set oWorkBook=oExcel.Workbooks.Open( "C:\"&emailname )
 	SendEmailALL oWorkBook, textname,filename
 	oExcel.Quit
 end if
@@ -173,27 +190,26 @@ End Class
 Function SendOneEmail(strSendAddr, strAcount, strAccountName, strPasswd,textname,filename)
     Set MyMail = New CdoMail
     '邮件正文内容文件读取
-    TextBodyFileDir = "C:\Users\Wang Jiajing\Desktop\简报\简报邮箱\"&textname
+    TextBodyFileDir = "C:\"&textname
     Set fso=CreateObject("Scripting.FileSystemObject")
     Set TextBodyFile=fso.OpenTextFile(TextBodyFileDir, 1, False, 0)
     TextBodyInfo = TextBodyFile.readall
     TextBodyFile.Close
     '设置服务器(*)：服务器地址、服务器端口、邮箱用户名、邮箱密码
-    MyMail.MailServerSet    "mail.hust.edu.cn", 25, strAccountName, strPasswd
+    MyMail.MailServerSet    "smtp.163.com", 25, strAccountName, strPasswd
     '设置寄件者与收件者地址(*)：寄件者、收件者、抄送副本(非必填)、密送副本(非必填)
     MyMail.MailFromTo       strAcount, "", "", strSendAddr
     '设置邮件内容(*)：内容类型(text/html/url)、邮件主旨标题、邮件正文文本
     MyMail.MailBody         "text", ie.document.getElementById("theme").value, TextBodyInfo
     '添加附件(非必填)：参数可以是一个文件路径，或者是一个包含多个文件路径的数组
-    'MyMail.MailAttachment   Split("e:\2016全国批判性思维教师培训通知.doc|e:\2016全国批判性思维会议通知.doc|e:\2016年第一届全国基础教育批判性思维教师培训班（20160227）.docx|e:\2016年第一届全国基础教育批判性思维年会通知（20160227).docx", "|")
-    MyMail.MailAttachment   Split("C:\Users\Wang Jiajing\Desktop\简报\简报邮箱\"&filename, "|")	
+    MyMail.MailAttachment   Split(filename, "|")	
 	WSH.Echo filename
 	' 发送邮件(*)
     MyMail.Send
 End Function
 Function SendEmailToOneSheetAddr(Sheet, uiSheetCnt,textname,filename)
-    arrAccountName = array("dian",ie.document.getElementById("user").value)'这里三行可以设置多个账号、密码
-    arrAccount = array("dian@hust.edu.cn(Dian Group)",ie.document.getElementById("user").value&"@hust.edu.cn("&ie.document.getElementById("username").value&")")
+    arrAccountName = array("",ie.document.getElementById("user").value)'这里三行可以设置多个账号、密码
+    arrAccount = array("",ie.document.getElementById("user").value&"@163.com("&ie.document.getElementById("username").value&")")
     arrPasswd = array("diangroup1",ie.document.getElementById("password").value)
     uiCntAddrMax = 40 '这里设置每封邮件发送密送人数的上限
     uiCntAddr = 0
@@ -202,10 +218,16 @@ Function SendEmailToOneSheetAddr(Sheet, uiSheetCnt,textname,filename)
     WSH.Echo "sheet " & uiSheetCnt & "总行数：" & uiRowMax
     'wscript.sleep 1*60*1000  '单位ms 1分钟  
     uiMyEmailCnt = 0
+	'正则匹配邮箱
+	Dim re
+	Set re = New RegExp
+	re.Pattern = "^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$"
+	re.Global = True
+	re.IgnoreCase = True
     For uiCntRow = 2 To uiRowMax '遍历每一行
         strCurAddr = Sheet.cells(uiCntRow,3).value 'Email信息在第3列
-        If  strCurAddr = "" Then
-        Else
+		If not re.Test(strCurAddr) Then
+		Else
             strSendAddr = strSendAddr & strCurAddr & ","
             uiCntAddr = uiCntAddr + 1
         End If        
@@ -240,7 +262,7 @@ Function SendEmailToOneSheetAddr(Sheet, uiSheetCnt,textname,filename)
 End Function
 
 Function SendEmailALL(Book,textname,filename)
-    For uiSheetCnt = 1 To 3 '注意修改这里的值，从第1张表到第22张表
+    For uiSheetCnt = ie.document.getElementById("from").value To ie.document.getElementById("to").value '注意修改这里的值，从第1张表到第22张表
         Set Sheet = Book.Sheets(uiSheetCnt)     
         SendEmailToOneSheetAddr Sheet,uiSheetCnt,textname,filename
     Next
