@@ -1,0 +1,59 @@
+﻿不用搭环境，Windows直接用。
+
+脚本使用前注意事项：
+0，主题：脚本第82行
+1，正文：脚本第72行是文档《简报邮件正文内容.txt》的路径，需要根据你的进行修改。
+2，附件：脚本第85行是文档《DianNewsletter_20160316_159.pdf》的路径，需要根据你的进行修改。
+3，邮箱列表：脚本第145行是文档《简报邮箱2016.3.16by胡巧平.xls》的路径，需要根据你的进行修改。
+4，发件人：
+脚本如何修改发送邮箱设置？
+脚本第89-91行内容：
+    arrAccountName = array("dian","dian")'这里三行可以设置多个账号、密码
+    arrAccount = array("dian@hust.edu.cn(Dian Group)","dian@hust.edu.cn(Dian Group)")
+    arrPasswd = array("diangroup1","diangroup1")
+脚本第89-91行内容：
+    arrAccountName = array("diangroup","diangroup")'这里三行可以设置多个账号、密码
+    arrAccount = array("diangroup@hust.edu.cn(Dian Group)","diangroup@hust.edu.cn(Dian Group)")
+    arrPasswd = array("1014274150hqp","1014274150hqp")
+	
+    arrAccountName = array("liuyu","liuyu")'这里三行可以设置多个账号、密码
+    arrAccount = array("liuyu@hust.edu.cn(刘玉)","liuyu@hust.edu.cn(刘玉)")
+    arrPasswd = array("mmmmm","mmmm")
+脚本使用前请先测试一下能不能用。
+5，设置发送表格从第几到第几张：
+
+
+测试方法及注意事项：
+1，使用前可以用一张测试邮箱文件先试试，看还有没有什么问题，我附带了我的测试邮件。《测试邮箱列表.xls》你可以把其中任何一个邮箱替换成你自己的邮箱。
+2，使用我发给你的测试邮箱列表测试时注意第138行改成从1到3就可以了，因为这个表只有三张表单，多了读不出来。正式发邮件给简报读者时需要改成1到22。
+
+脚本运行方法：
+在脚本所在的目录下，shift+鼠标右键，选择“在此处打开命令窗口”，打开命令行界面后，输入“CScript sendemail.vbs”即可。运行过程会自己打印出当前已经发送邮件的所有邮箱。
+
+可能出错及应对：
+1，邮件必须使用启明学院的校园网，注意不要使用电信网，所以发之前查一下IP。（点团队校园网邮箱只对启明学院的校园网开放群发功能，否则很容易一天的发送量就满了。）
+2，一般出错都是因为速度问题，通常发一回简报大概会有4到5次停下了不发，打印的信息一般都是说发的频率太高，具体打印的信息是too much 什么东西来着。
+3，如果出错，记录一下已经发送到的位置，需要改表单。比如如果发送到第7张表的第40个邮箱脚本跪了，就把邮箱列表打开，删除前面40个邮箱，保存在原地，然后把脚本第137行的1到22改成7到22。重启脚本即可。
+如果出错是因为发送频率太快，还需要注意一下校园网会阻止这个邮箱一段时间，所以可以把发邮件的邮箱改成另一个。继续发。
+（这里注意一下脚本跪了的时候邮箱列表还是打开状态，所以电脑不让你修改保存内容，所以需要启动任务管理器强制关闭EXCEL进程，再对邮箱列表进行操作保存。正常运行完脚本的话是会关闭的邮箱列表的。。。）
+4,如果已经开始发了突然想起来什么地方搞错了，不该发的，想要阻止，直接ctrl+C 即可停止。然后按照上述方法重启脚本接着发。
+
+目前常用邮箱是：
+1,dian@hust.edu.cn diangroup1 
+2,u201213539@hust.edu.cn(别名diangroup@hust.edu.cn)  1014274150hqp (我个人的学校邮箱，有时候团队邮箱出了问题也用这个。)
+
+
+	
+其他说明：
+这个脚本的意思就是每隔四分钟发一次邮件，一次邮件给40个人密送。
+如果有什么其他意外的话你也可以自己把发送时间间隔改小一些，发送邮件的时间间隔在111和126行修改。
+如果两个邮箱都出了问题，就回到原来手动发邮件的方式吧，那就只能翻墙用Gmail发了。登录之前给我打电话，如果需要验证码什么的可以找我，我会记得在那天保持手机畅通，不会再像上次那样了。
+	diannewsletter@gmail.com      diangroup
+    diannewsletter1@gmail.com    letternewsdian1
+    diannewsletter2@gmail.com    letternewsdian2
+    diannewsletter3@gmail.com    DianGroup123
+    diannewsletter4@gmail.com    letternewsdian
+    diannewsletter5@gmail.com    letternewsdian
+    diannewsletter6@gmail.com    DianGroup123
+    diannewsletter7@gmail.com    letternewsdian
+	
